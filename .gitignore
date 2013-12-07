@@ -1,6 +1,198 @@
-*.class
+//Import controlP5 library;
+import controlP5.*;
 
-# Package Files #
-*.jar
-*.war
-*.ear
+//Import Minim library;
+import ddf.minim.*;
+
+//Import Minim Signals;
+import ddf.minim.signals.*;
+
+//Import Minim Effects;
+import ddf.minim.effects.*; 
+
+// Create a variable (object) named gui (graphical user interface);
+ControlP5 gui;
+
+//Create variable of Minim;
+Minim minim;
+
+//Create a variable of Audio Output to handle signal output;
+AudioOutput out;
+
+//Create three variables of AudioPlayers type;
+AudioPlayer playerexplosion;
+AudioPlayer playerlaser;
+AudioPlayer playergameover;
+
+//Declare a variable of sphereDiameter type equal to 10
+//Spheres' Diameter
+int sphereDiameter = 10;
+
+//Declare a new type of variable, shoot of boolean type.
+//Boolean variables can only hold, at any time, one of two values - true or false. 
+//Shoot is initialised this variable here to be false;
+boolean shoot = false;
+
+//Declare a variable of randx type;
+  int randx()
+  
+//Indicate the value to return from a function
+//which must be the same datatype as defined in the declaration (600)
+  {
+//Generate random number each time the random() function is called, 
+//it returns an unexpected value within the specified range.
+    return int(random(600));
+  }
+
+//Declare a variable of sphereXCoords type for a 2D array of random values
+  int[] sphereXCoords = { randx(), randx(), randx(), randx(), randx() };
+//Declare a variable of sphereYCoords type for a 2D array values equal to 0;
+  int[] sphereYCoords = { 0, 0, 0, 0, 0 };
+  
+//Declare a variable of hit type equal to 0;
+  int hit = 0;
+  
+//Set screen size, the background colour etc;
+ void setup()
+ 
+  {
+   //Set the size of the window;
+    size(600,620);
+    minim = new Minim(this);   // new code
+    out = minim.getLineOut(Minim.STEREO);
+    gui = new ControlP5(this);
+    
+//Assign sound file to the object playeraexplosion;
+     playerexplosion = minim.loadFile ("Explosion.mp3", 1024);
+     
+//Assign sound file to the object playerlaser;
+     playerlaser = minim.loadFile ("Laser.mp3", 1024);
+     
+//Assign sound file to the object playergameover;    
+     playergameover = minim.loadFile ("Gameover.mp3", 1024);
+  }
+  
+//Function executed repeatedly whenever there is drawing or animation to be done;
+  void draw()
+  
+  {
+//Function executed repeatedly whenever there is drawing or animation to be done;
+    background(0);
+//Set the color used to fill shapes.
+    fill(color(0,255,0)); //Black;
+    stroke(color(0,255,0)); //Black;
+//Create a green triangle shape;
+    triangle(mouseX-8, 580, mouseX+8, 580, mouseX, 565);
+//Give a blue colour to the laser
+    fill(color(0,0,300));
+    stroke(color(0,0,300));
+
+//Condition applied to the program if shoot is equal to true;
+    if(shoot==true)
+    {
+      sphereKiller(mouseX);
+//shoot is execute only once at the time;
+      shoot = false;
+//playerlaser plays the audio file assigned once when shoot is equal to true;
+      playerlaser.play();
+//playerlaser rewinds the audio file assigned everytime shoot is equal to true;
+      playerlaser.rewind();
+    }
+//Create a sphereDropper variable when shoot is equal or not to true; 
+    sphereDropper();
+//Create a gameEnder variable when shoot is equal or not to true; 
+    gameEnder();  
+  }
+  
+//Add a mouse click, when it happens, mousePressed is executed;
+  void mousePressed()
+  
+  {
+//Condition applied to the program when hit is equal to true;
+    shoot = true;
+//playerlaser plays sound file assigned to it everytime shoot is equal to "true";
+    playerlaser.play();
+//playerlaser rewinds sound file assigned to it everytime shoot is equal to "true";
+    playerlaser.rewind();
+//Write into the text area of the Processing environment's console
+//to look at the data the program is producing;    
+    println("Shoot");
+  }
+ 
+//Add a sphereDropper function;  
+  void sphereDropper()
+  {  
+ //Set colour used to draw lines and borders around shapes
+ //in this case white;
+    stroke(255);
+// Set the color used to fill shapes
+//in this case white;
+    fill(255);
+    
+// Initialize 2D array values   
+//for () controls a sequence of repetitions;
+    for (int i=0; i<5; i++)
+    {
+      ellipse(sphereXCoords[i], sphereYCoords[i]++,
+              sphereDiameter, sphereDiameter);
+    }
+  }
+  
+//Add a sphereKiller function;  
+  void sphereKiller
+ (int shotX)
+  {
+    boolean hit = false;
+//An array which uses a nested loop in order to reference every elemenent;
+//for () controls a sequence of repetitions;
+    for (int i = 0; i < 5; i++)
+    {   
+      if((shotX >= (sphereXCoords[i]-sphereDiameter/2)) && 
+         (shotX <= (sphereXCoords[i]+sphereDiameter/2)))
+      { 
+//Condition applied when hit is equal to true;
+        hit = true;
+        line(mouseX, 565, mouseX, sphereYCoords[i]);
+        ellipse(sphereXCoords[i], sphereYCoords[i],
+                sphereDiameter+25, sphereDiameter+25);
+        sphereXCoords[i] = randx();
+        sphereYCoords[i] = 0;
+//playerexplosion plays audio file assigned once when hit is equal to true;
+        playerexplosion.play();
+//playerexplosion rewinds the assigned audio everytime hit is equal to true;
+        playerexplosion.rewind();
+ //Write into the text area of the Processing environment's console
+//to look at the data the program is producing;
+        println("Hit");
+      }   
+    }
+  
+//Conditions applied to the program only when hit is equal to false;
+    if(hit == false)
+    {
+      line(mouseX, 565, mouseX, 0);
+//playerexplosion doesn't play the sound file associated with it      
+      playerexplosion.pause();
+    }  
+  }
+
+//Function executed when the sphere hits the bottom surface;  
+  void gameEnder()
+  {
+//An array which uses a nested loop in order to reference every elemenent;
+//for () controls a sequence of repetitions;
+    for (int i=0; i< 5; i++)
+    {
+      if(sphereYCoords[i]==600)
+      {
+        fill(color(255,0,0));
+//stop Processing from continuously executing the code;        
+        noLoop();
+//playergameover plays assigned audio file;
+        playergameover.play();
+//Write into the text area of the Processing environment's console
+//to look at the data the program is producing;        
+        println("Game Over");
+      }
+    }
+  }
