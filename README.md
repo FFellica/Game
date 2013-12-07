@@ -1,9 +1,11 @@
-Game
+Shooting Game
 ====
 
-//1.	Compile the codes by clicking on the Run button 
+//1.	Copy and paste the code in Prcessing
+
+//2.    Complite the code by clicking on the Run button 
 	
-//2.	Move the mouse left or right to move the cursor
+//3.	Move the mouse left or right to move the cursor
 	
-//3.	Left click the mouse to shoot
+//4.	Left click the mouse to shoot
 
